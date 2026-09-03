@@ -96,4 +96,10 @@ func main() {
 	userDB := db.NewUserDB(mysqlConnection)
 	authHandler := authorize.NewAuthHandler(publicKey, userDB, mySes)
 	newApp.Use(authorize.CheckAccessToken(authHandler))
+	newApp.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "ok",
+		})
+	})
+	newApp.Run(":" + port)
 }
