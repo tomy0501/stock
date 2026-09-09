@@ -9,6 +9,7 @@ import (
 	"stock/authorize"
 	"stock/db"
 	"stock/myRedis"
+	"stock/stock"
 	"time"
 
 	redigo "github.com/gomodule/redigo/redis"
@@ -93,13 +94,32 @@ func main() {
 	}
 	mySes := myRedis.NewPrefixRedisStoreWithPool(myPool, "stockService", 3600, []byte(secretKey))
 
+	stockPemString, err := os.ReadFile("stock_public.pem")
+	if err != nil {
+		log.Fatalf("Error reading stock public key: %v", err)
+	}
+	stockPublicKey, err := jwt.ParseRSAPublicKeyFromPEM(stockPemString)
+	if err != nil {
+		log.Fatalf("Error parsing stock public key: %v", err)
+	}
+
+	apiKey := os.Getenv("API_KEY")
+
+	apiUrl := os.Getenv("API_URL")
+
 	userDB := db.NewUserDB(mysqlConnection)
 	authHandler := authorize.NewAuthHandler(publicKey, userDB, mySes)
+	facilityHandler := authorize.NewFacilityTokenHandler(stockPublicKey, mySes, apiKey, apiUrl)
 	newApp.Use(authorize.CheckAccessToken(authHandler))
+	newApp.Use(authorize.CheckFacilityToken(facilityHandler))
 	newApp.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": "ok",
 		})
 	})
+
+	stockRepository := stock.NewStockRepository(userDB, mySes)
+	stockHandler := stock.NewStockHandler(stockRepository)
+	newApp.GET("/stock/:room_type_id/:month/:day", stockHandler.GetPerMonth)
 	newApp.Run(":" + port)
 }

@@ -8,6 +8,7 @@ import (
 
 type RedisPool interface {
 	Save(id string, values map[string]any) error
+	SaveWithTTL(id string, values map[string]any, ttl int) error
 	Load(id string) (map[string]any, error)
 	Key(id string) string
 	Delete(id string) error
@@ -45,6 +46,23 @@ func (s *prefixRedisStoreWithPool) Save(id string, values map[string]any) error 
 	}
 	conn := s.pool.Get()
 	_, err = conn.Do("SET", id, encrytData, "EX", s.ttl)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *prefixRedisStoreWithPool) SaveWithTTL(id string, values map[string]any, ttl int) error {
+	data, err := json.Marshal(values)
+	if err != nil {
+		return err
+	}
+	encrytData, err := encrypt(data, s.secretKey)
+	if err != nil {
+		return err
+	}
+	conn := s.pool.Get()
+	_, err = conn.Do("SET", id, encrytData, "EX", ttl)
 	if err != nil {
 		return err
 	}
