@@ -2,6 +2,7 @@ package authorize
 
 import (
 	"crypto/rsa"
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,12 +57,14 @@ func CheckFacilityToken(h FacilityHandlerInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		facilityData, err := h.GetFacilityAuthData(c)
 		if err != nil {
+			slog.Error("facilityToken is Invalid", "error", err)
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "facility token is invalid", "code": "TOKEN_INVALID"})
 			c.Abort()
 			return
 		}
 		role, err := h.GetFacilityRole(facilityData)
 		if err != nil {
+			slog.Error("can't access facilityRole", "error", err)
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "facility token is invalid", "code": "TOKEN_INVALID"})
 			c.Abort()
 			return
