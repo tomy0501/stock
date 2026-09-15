@@ -69,20 +69,24 @@ func (f *facilityTokenHandler) GetFacilityRole(facilityData *FacilityAuthData) (
 	}
 	apiKey := f.apiKey
 	if apiKey == "" {
+		slog.Error("apiキーが見つかりません。")
 		return "", nil
 	}
 	apiUrl := f.url
 	if apiUrl == "" {
+		slog.Error("URLが見つかりません。")
 		return "", nil
 	}
 	httpClient := &http.Client{}
 	req, err := http.NewRequest("GET", apiUrl+"/validateRole", nil)
 	if err != nil {
+		slog.Error("HTTPクライアントの作成に失敗しました。", "error", err)
 		return "", err
 	}
 	req.Header.Set("X-API-Key", apiKey)
 	resp, err := httpClient.Do(req)
 	if err != nil {
+		slog.Error("APIサーバーとの通信に失敗しました。")
 		return "", err
 	}
 	defer resp.Body.Close()
