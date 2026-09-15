@@ -19,7 +19,7 @@ func CheckAccessToken(h AuthHandlerInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		accessToken, err := c.Cookie("accessToken")
 		if err != nil {
-			slog.Error("not found accessToken")
+			slog.Error("not found accessToken", "error", err)
 			c.JSON(http.StatusUnauthorized, gin.H{"message": "accessToken is invalid", "code": "TOKEN_INVALID"})
 			c.Abort()
 			return
