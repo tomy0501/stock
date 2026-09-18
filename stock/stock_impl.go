@@ -15,10 +15,11 @@ type StockRepository struct {
 }
 
 type StockDatabaseColumn struct {
-	Date     string `db:"date"`
-	Stock    int    `db:"stock"`
-	Reserved int    `db:"reserved"`
-	Stopped  int    `db:"stopped"`
+	FacilityID string `db:"facility_id"`
+	Date       string `db:"date"`
+	Stock      int    `db:"stock"`
+	Reserved   int    `db:"reserved"`
+	Stopped    int    `db:"stopped"`
 }
 
 func NewStockRepository(db db.UserDB, myRedis myRedis.RedisPool) StockHandlerInterface {
@@ -28,7 +29,7 @@ func NewStockRepository(db db.UserDB, myRedis myRedis.RedisPool) StockHandlerInt
 	}
 }
 
-func (s *StockRepository) GetStockDataPerMonth(roomTypeID string, year int, month int) (*RoomStockData, error) {
+func (s *StockRepository) GetStockDataPerMonth(roomTypeID string, year int, month int, facilityID string) (*RoomStockData, error) {
 	yearMonth, err := time.Parse("2006-01", fmt.Sprintf("%04d-%02d", year, month))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse year and month: %v", err)
@@ -40,16 +41,19 @@ func (s *StockRepository) GetStockDataPerMonth(roomTypeID string, year int, mont
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse room type ID: %v", err)
 	}
-
+	parsedFacilityID, err := uuid.Parse(facilityID)
+	if err != nil {
+		return nil, err
+	}
 	sql := `
-		SELECT date, stock, reserved, stopped
+		SELECT facility_id,date, stock, reserved, stopped
 		FROM room_stock
-		WHERE room_type_id = ? AND date BETWEEN ? AND ?
+		WHERE room_type_id = ? AND date BETWEEN ? AND ? AND facility_id = ?
 		ORDER BY date ASC
 	`
 	var stockData []StockDatabaseColumn
 
-	err = s.db.UserDB.Select(&stockData, sql, parsedRoomTypeID, firstDay, lastDay)
+	err = s.db.UserDB.Select(&stockData, sql, parsedRoomTypeID[:], firstDay, lastDay, parsedFacilityID[:])
 	if err != nil {
 		return nil, fmt.Errorf("failed to query stock data: %v", err)
 	}

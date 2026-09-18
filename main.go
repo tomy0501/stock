@@ -108,10 +108,9 @@ func main() {
 	apiUrl := os.Getenv("API_URL")
 
 	userDB := db.NewUserDB(mysqlConnection)
-	authHandler := authorize.NewAuthHandler(publicKey, userDB, mySes)
-	facilityHandler := authorize.NewFacilityTokenHandler(stockPublicKey, mySes, apiKey, apiUrl)
+	authHandler := authorize.NewAuthHandler(publicKey, userDB, mySes, apiKey, apiUrl, stockPublicKey)
+
 	newApp.Use(authorize.CheckAccessToken(authHandler))
-	newApp.Use(authorize.CheckFacilityToken(facilityHandler))
 	newApp.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": "ok",

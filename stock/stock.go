@@ -15,7 +15,7 @@ type RoomStockData struct {
 }
 
 type StockHandlerInterface interface {
-	GetStockDataPerMonth(roomTypeID string, year int, month int) (*RoomStockData, error)
+	GetStockDataPerMonth(roomTypeID string, year int, month int, facilityID string) (*RoomStockData, error)
 }
 
 type stockHandler struct {
@@ -23,6 +23,7 @@ type stockHandler struct {
 }
 
 type StockHandleURL struct {
+	FacilityID string `uri:"facility_id" binding:"required"`
 	RoomTypeID string `uri:"room_type_id" binding:"required"`
 	Month      int    `uri:"month" binding:"required"`
 	Day        int    `uri:"day" binding:"required"`
@@ -41,7 +42,7 @@ func (s *stockHandler) GetPerMonth(c *gin.Context) {
 		return
 	}
 
-	stockData, err := s.StockHandlerIF.GetStockDataPerMonth(urlParams.RoomTypeID, urlParams.Month, urlParams.Day)
+	stockData, err := s.StockHandlerIF.GetStockDataPerMonth(urlParams.RoomTypeID, urlParams.Month, urlParams.Day, urlParams.FacilityID)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

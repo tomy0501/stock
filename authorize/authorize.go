@@ -2,29 +2,24 @@ package authorize
 
 import (
 	"crypto/rsa"
-	"stock/db"
-	"stock/myRedis"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
+type CustomClaims struct {
+	jwt.RegisteredClaims
+	Username string `json:"username"`
+	Role     string `json:"role"`
+}
+
+type FacilityClaims struct {
+	jwt.RegisteredClaims
+	UserFacilitys []string `json:"facilities"`
+}
 type AuthHandlerInterface interface {
 	GetPublicKey() *rsa.PublicKey
-}
-
-type authHandler struct {
-	publicKey *rsa.PublicKey
-	// インターフェースから定義してモックが作れるような設計する
-	db    db.UserDB
-	redis myRedis.RedisPool
-}
-
-func (a *authHandler) GetPublicKey() *rsa.PublicKey {
-	return a.publicKey
-}
-
-func NewAuthHandler(publicKey *rsa.PublicKey, db db.UserDB, redis myRedis.RedisPool) AuthHandlerInterface {
-	return &authHandler{
-		publicKey: publicKey,
-		db:        db,
-		redis:     redis,
-	}
+	GetFacilityTokenPublicKey() *rsa.PublicKey
+	GetAccessToken(c *gin.Context) (*CustomClaims, error)
+	GetFacilityToken(c *gin.Context) (*FacilityClaims, error)
 }
