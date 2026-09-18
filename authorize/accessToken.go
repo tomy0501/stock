@@ -25,7 +25,7 @@ func CheckAccessToken(h AuthHandlerInterface) gin.HandlerFunc {
 				return
 			}
 		}
-		c.Set("accessToken", accessToken)
+
 		userID, err := accessToken.GetSubject()
 
 		if err != nil {
