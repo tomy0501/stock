@@ -103,9 +103,9 @@ func main() {
 		log.Fatalf("Error parsing stock public key: %v", err)
 	}
 
-	apiKey := os.Getenv("API_KEY")
+	apiKey := os.Getenv("FACILITY_API_KEY")
 
-	apiUrl := os.Getenv("API_URL")
+	apiUrl := os.Getenv("FACILITY_API_URL")
 
 	userDB := db.NewUserDB(mysqlConnection)
 	authHandler := authorize.NewAuthHandler(publicKey, userDB, mySes, apiKey, apiUrl, stockPublicKey)
