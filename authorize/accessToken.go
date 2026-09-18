@@ -13,7 +13,7 @@ func CheckAccessToken(h AuthHandlerInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		accessToken, err := h.GetAccessToken(c)
 		if err != nil {
-			if errors.Is(jwt.ErrTokenExpired, err) {
+			if errors.Is(jwt.ErrTokenExpired, err) || errors.Is(http.ErrNoCookie, err) {
 				slog.Info("jwt is expired please rerresh", "info", accessToken)
 				c.JSON(http.StatusUnauthorized, gin.H{"message": "please token refresh", "code": "TOKEN_EXPIRED"})
 				c.Abort()
