@@ -81,7 +81,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 				return nil, errors.New("can't exist access token in session")
 			}
 			httpClient := &http.Client{}
-			req, err := http.NewRequest("GET", apiUrl+"/validateRole", nil)
+			req, err := http.NewRequest("GET", apiUrl+"facilityAuthorization", nil)
 			if err != nil {
 				slog.Error("HTTPクライアントの作成に失敗しました。", "error", err)
 				return nil, err
