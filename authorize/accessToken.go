@@ -41,6 +41,7 @@ func CheckAccessToken(h AuthHandlerInterface) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		slog.Info("check facilities", "facilityToken", facilityToken)
 		accessFacilities := facilityToken.UserFacilitys
 		c.Set("facilities", accessFacilities)
 
