@@ -97,6 +97,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 				slog.Error("cant not get facility token from server", "error", resp)
 				return nil, errors.New("faild connect of server")
 			}
+			slog.Info("check response", "resp", resp)
 			cookieString = resp.Header.Get("X-AuthorizationToken")
 			if cookieString == "" {
 				return nil, errors.New("can't not get cookie string from header")
