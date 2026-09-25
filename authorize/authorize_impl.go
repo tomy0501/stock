@@ -102,6 +102,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 			if cookieString == "" {
 				return nil, errors.New("can't not get cookie string from header")
 			}
+			c.SetCookie("facilityToken", cookieString, 60*60*24, "/", "", true, true)
 		} else {
 			return nil, err
 		}
@@ -120,11 +121,6 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 
 	if err != nil || !token.Valid {
 		if errors.Is(jwt.ErrTokenExpired, err) {
-			apiKey := h.GetAPIKey()
-			if apiKey == "" {
-				err := errors.New("APIキーがありません。")
-				return nil, err
-			}
 			apiUrl := h.GetServerURL()
 			if apiUrl == "" {
 				err := errors.New("URLがありません。")
@@ -135,7 +131,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 				return nil, errors.New("can't exist access token in session")
 			}
 			httpClient := &http.Client{}
-			req, err := http.NewRequest("GET", apiUrl+"/validateRole", nil)
+			req, err := http.NewRequest("GET", apiUrl+"facilityAPI/facilityAuthorization", nil)
 			if err != nil {
 				slog.Error("HTTPクライアントの作成に失敗しました。", "error", err)
 				return nil, err
