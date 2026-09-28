@@ -15,7 +15,7 @@ type CustomClaims struct {
 
 type FacilityClaims struct {
 	jwt.RegisteredClaims
-	UserFacilitys []string `json:"facilities"`
+	UserFacilities []string `json:"userFacilities"`
 }
 type AuthHandlerInterface interface {
 	GetPublicKey() *rsa.PublicKey
