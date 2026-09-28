@@ -166,6 +166,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 			}
 			return &facilityClaims, nil
 		} else {
+			slog.Error("happen jwt unknown error")
 			return nil, err
 		}
 
