@@ -1,6 +1,11 @@
 package stock
 
-import "github.com/gin-gonic/gin"
+import (
+	"log/slog"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 type StockData struct {
 	Date     string `json:"date" binding:"required,datetime=2006-01-02"`
@@ -39,6 +44,12 @@ func (s *stockHandler) GetPerMonth(c *gin.Context) {
 	var urlParams StockHandleURL
 	if err := c.ShouldBindUri(&urlParams); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	useID := c.GetString("userID")
+	if useID == "" {
+		slog.Error("not exists userID")
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "invalid session status"})
 		return
 	}
 
