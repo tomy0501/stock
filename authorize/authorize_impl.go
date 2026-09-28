@@ -38,6 +38,8 @@ func (a *authHandler) GetFacilityTokenPublicKey() *rsa.PublicKey {
 	return a.facilityTokenPublicKey
 }
 
+var httpClient = &http.Client{}
+
 func (a *authHandler) GetAccessToken(c *gin.Context) (*CustomClaims, error) {
 	cookieString, err := c.Cookie("accessToken")
 	if err != nil {
@@ -80,7 +82,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 			if accessToken == "" {
 				return nil, errors.New("can't exist access token in session")
 			}
-			httpClient := &http.Client{}
+
 			req, err := http.NewRequest("GET", apiUrl+"facilityAPI/facilityAuthorization", nil)
 			if err != nil {
 				slog.Error("HTTPクライアントの作成に失敗しました。", "error", err)
