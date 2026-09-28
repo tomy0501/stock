@@ -65,7 +65,7 @@ func (a *authHandler) GetAccessToken(c *gin.Context) (*CustomClaims, error) {
 func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) {
 	cookieString, err := c.Cookie("facilityToken")
 	if err != nil {
-		if errors.Is(http.ErrNoCookie, err) {
+		if errors.Is(err, http.ErrNoCookie) {
 			apiKey := h.GetAPIKey()
 			if apiKey == "" {
 				err := errors.New("APIキーがありません。")
@@ -120,7 +120,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 	})
 
 	if err != nil || !token.Valid {
-		if errors.Is(jwt.ErrTokenExpired, err) {
+		if errors.Is(err, jwt.ErrTokenExpired) {
 			apiUrl := h.GetServerURL()
 			if apiUrl == "" {
 				err := errors.New("URLがありません。")
