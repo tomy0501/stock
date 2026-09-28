@@ -161,6 +161,7 @@ func (h *authHandler) GetFacilityToken(c *gin.Context) (*FacilityClaims, error) 
 				return h.GetFacilityTokenPublicKey(), nil
 			})
 			if err != nil || !token.Valid {
+				slog.Error("token reget is failed")
 				return nil, err
 			}
 			return &facilityClaims, nil
