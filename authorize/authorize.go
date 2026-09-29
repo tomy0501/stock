@@ -14,8 +14,8 @@ type CustomClaims struct {
 }
 
 type Role struct {
-	HotelID string     `json:"HotelID"`
-	Role    HotelRoles `json:"Role"`
+	HotelID string `json:"HotelID"`
+	Role    string `json:"Role"`
 }
 
 type HotelRoles string
