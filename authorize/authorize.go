@@ -13,9 +13,24 @@ type CustomClaims struct {
 	Role     string `json:"role"`
 }
 
+type Role struct {
+	HotelID string     `json:"HotelID"`
+	Role    HotelRoles `json:"Role"`
+}
+
+type HotelRoles string
+
+const (
+	StatusOwner        HotelRoles = "owner"
+	StatusManager      HotelRoles = "manager"
+	StatusFront        HotelRoles = "front"
+	StatusHousekeeping HotelRoles = "housekeeping"
+	StatusStaff        HotelRoles = "staff"
+)
+
 type FacilityClaims struct {
 	jwt.RegisteredClaims
-	UserFacilities []string `json:"userFacilities"`
+	UserFacilities []Role `json:"role"`
 }
 type AuthHandlerInterface interface {
 	GetPublicKey() *rsa.PublicKey
