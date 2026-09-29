@@ -30,7 +30,7 @@ const (
 
 type FacilityClaims struct {
 	jwt.RegisteredClaims
-	UserFacilities []Role `json:"role"`
+	UserFacilities []Role `json:"userFacilities"`
 }
 type AuthHandlerInterface interface {
 	GetPublicKey() *rsa.PublicKey
