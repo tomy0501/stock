@@ -28,6 +28,7 @@ const (
 	StatusStaff        HotelRoles = "staff"
 )
 
+// Custom claim to permitted FacilityInfo
 type FacilityClaims struct {
 	jwt.RegisteredClaims
 	UserFacilities []Role `json:"userFacilities"`
