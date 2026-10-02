@@ -119,7 +119,7 @@ func main() {
 
 	stockRepository := stock.NewStockRepository(userDB, mySes)
 	stockHandler := stock.NewStockHandler(stockRepository)
-	newApp.GET("/stock/:room_type_id/:month/:day", stockHandler.GetPerMonth)
+	newApp.GET("/stock/:facility_id/:room_type_id/:month/:day", stockHandler.GetPerMonth)
 	newApp.Run(":" + port)
 	slog.Info("runnning application in " + port)
 }
