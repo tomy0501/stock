@@ -16,10 +16,10 @@ type StockRepository struct {
 
 type StockDatabaseColumn struct {
 	FacilityID string `db:"facility_id"`
-	Date       string `db:"date"`
-	Stock      int    `db:"stock"`
-	Reserved   int    `db:"reserved"`
-	Stopped    int    `db:"stopped"`
+	Date       string `db:"stock_date"`
+	Stock      int    `db:"stock_quantity"`
+	Reserved   int    `db:"reservation_quantity"`
+	Stopped    int    `db:"stop_sale_quantity"`
 }
 
 func NewStockRepository(db db.UserDB, myRedis myRedis.RedisPool) StockHandlerInterface {
@@ -46,10 +46,10 @@ func (s *StockRepository) GetStockDataPerMonth(roomTypeID string, year int, mont
 		return nil, err
 	}
 	sql := `
-		SELECT facility_id,date, stock, reserved, stopped
-		FROM room_stock
-		WHERE room_type_id = ? AND date BETWEEN ? AND ? AND facility_id = ?
-		ORDER BY date ASC
+		SELECT facility_id,room_type_id,stock_date, stock_quantity, reservation_quantity, stop_sale_quantity
+		FROM stock_room
+		WHERE room_type_id = ? AND stock_date BETWEEN ? AND ? AND facility_id = ?
+		ORDER BY stock_date ASC
 	`
 	var stockData []StockDatabaseColumn
 
