@@ -46,7 +46,7 @@ func (s *StockRepository) GetStockDataPerMonth(roomTypeID string, year int, mont
 		return nil, err
 	}
 	sql := `
-		SELECT facility_id,room_type_id,stock_date, stock_quantity, reservation_quantity, stop_sale_quantity
+		SELECT facility_id,stock_date, stock_quantity, reservation_quantity, stop_sale_quantity
 		FROM stock_room
 		WHERE room_type_id = ? AND stock_date BETWEEN ? AND ? AND facility_id = ?
 		ORDER BY stock_date ASC
