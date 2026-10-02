@@ -43,7 +43,7 @@ func NewStockHandler(stockHandlerIF StockHandlerInterface) *stockHandler {
 func (s *stockHandler) GetPerMonth(c *gin.Context) {
 	var urlParams StockHandleURL
 	if err := c.ShouldBindUri(&urlParams); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": "invalid URL parameters"})
 		return
 	}
 	useID := c.GetString("userID")
@@ -55,7 +55,8 @@ func (s *stockHandler) GetPerMonth(c *gin.Context) {
 
 	stockData, err := s.StockHandlerIF.GetStockDataPerMonth(urlParams.RoomTypeID, urlParams.Month, urlParams.Day, urlParams.FacilityID)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		slog.Error("failed to get stock data", "error", err)
+		c.JSON(500, gin.H{"error": "failed to get stock data"})
 		return
 	}
 
