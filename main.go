@@ -120,6 +120,9 @@ func main() {
 	stockRepository := stock.NewStockRepository(userDB, mySes)
 	stockHandler := stock.NewStockHandler(stockRepository)
 	newApp.GET("/stock/:facility_id/:room_type_id/:month/:day", stockHandler.GetPerMonth)
+	newApp.POST("/stock/stock/:facility_id/:room_type_id/:year/:month/:day/:value", stockHandler.UpdateStock)
+	newApp.POST(("/stock/reserved/:facility_id/:room_type_id/:year/:month/:day/:value"), stockHandler.UpdateReserved)
+	newApp.POST("/stock/stopSell/:facility_id/:room_type_id/:year/:month/:day/:value", stockHandler.UpdateStopSell)
 	newApp.Run(":" + port)
 	slog.Info("runnning application in " + port)
 }

@@ -75,3 +75,76 @@ func (s *StockRepository) GetStockDataPerMonth(roomTypeID string, year int, mont
 	result.StockData = stockDataList
 	return &result, nil
 }
+
+func (s *StockRepository) PutStockData(roomTypeID string, year int, month int, day int, facilityID string, value int) error {
+	date, err := time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", year, month, day))
+	if err != nil {
+		return err
+	}
+	parsedRoomTypeID, err := uuid.Parse(roomTypeID)
+	if err != nil {
+		return err
+	}
+	parsedFacilityID, err := uuid.Parse(facilityID)
+	if err != nil {
+		return err
+	}
+
+	sql := `
+	UPDATE stock SET stock_quantity = ?
+	WHERE room_type_id = ? AND stock_date = ? AND facility_id = ? AND stock_date = ?
+	`
+	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date.Format("2006-01-02"), parsedFacilityID[:])
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *StockRepository) PutReservedData(roomTypeID string, year int, month int, day int, facilityID string, value int) error {
+	date, err := time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", year, month, day))
+	if err != nil {
+		return err
+	}
+	parsedRoomTypeID, err := uuid.Parse(roomTypeID)
+	if err != nil {
+		return err
+	}
+	parsedFacilityID, err := uuid.Parse(facilityID)
+	if err != nil {
+		return err
+	}
+
+	sql := `
+	UPDATE stock SET reservation_quantity = ?
+	WHERE room_type_id = ? AND stock_date = ? AND facility_id = ? AND stock_date = ?`
+	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date.Format("2006-01-02"), parsedFacilityID[:], date.Format("2006-01-02"))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *StockRepository) PutStopSellData(roomTypeID string, year int, month int, day int, facilityID string, value int) error {
+	date, err := time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", year, month, day))
+	if err != nil {
+		return err
+	}
+	parsedRoomTypeID, err := uuid.Parse(roomTypeID)
+	if err != nil {
+		return err
+	}
+	parsedFacilityID, err := uuid.Parse(facilityID)
+	if err != nil {
+		return err
+	}
+
+	sql := `
+	UPDATE stock SET stop_sale_quantity = ?
+	WHERE room_type_id = ? AND stock_date = ? AND facility_id = ? AND stock_date = ?`
+	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date.Format("2006-01-02"), parsedFacilityID[:], date.Format("2006-01-02"))
+	if err != nil {
+		return err
+	}
+	return nil
+}
