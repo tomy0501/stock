@@ -63,6 +63,7 @@ type UpdateStockRequest struct {
 func (s *stockHandler) GetPerMonth(c *gin.Context) {
 	var urlParams StockHandleURL
 	if err := c.ShouldBindUri(&urlParams); err != nil {
+		slog.Error("failed to bind URL parameters", "error", err)
 		c.JSON(400, gin.H{"message": "invalid URL parameters"})
 		return
 	}
@@ -86,6 +87,7 @@ func (s *stockHandler) GetPerMonth(c *gin.Context) {
 func (s *stockHandler) UpdateStock(c *gin.Context) {
 	var urlParams UpdateStockRequest
 	if err := c.ShouldBindJSON(&urlParams); err != nil {
+		slog.Error("failed to bind JSON parameters", "error", err)
 		c.JSON(400, gin.H{"message": "invalid request body"})
 		return
 	}
@@ -110,6 +112,7 @@ func (s *stockHandler) UpdateStock(c *gin.Context) {
 func (s *stockHandler) UpdateReserved(c *gin.Context) {
 	var urlParams UpdateStockRequest
 	if err := c.ShouldBindJSON(&urlParams); err != nil {
+		slog.Error("failed to bind JSON parameters", "error", err)
 		c.JSON(400, gin.H{"message": "invalid request body"})
 		return
 	}
@@ -135,6 +138,7 @@ func (s *stockHandler) UpdateReserved(c *gin.Context) {
 func (s *stockHandler) UpdateStopSell(c *gin.Context) {
 	var urlParams UpdateStockRequest
 	if err := c.ShouldBindJSON(&urlParams); err != nil {
+		slog.Error("failed to bind JSON parameters", "error", err)
 		c.JSON(400, gin.H{"message": "invalid request body"})
 		return
 	}
