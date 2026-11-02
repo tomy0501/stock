@@ -52,12 +52,12 @@ func NewStockHandler(stockHandlerIF StockHandlerInterface) *stockHandler {
 }
 
 type UpdateStockRequest struct {
-	RoomTypeID string `json:"room_type_id" binding:"required"`
-	Year       int    `json:"year" binding:"required"`
-	Month      int    `json:"month" binding:"required"`
-	Day        int    `json:"day" binding:"required"`
-	FacilityID string `json:"facility_id" binding:"required"`
-	Value      int    `json:"value" binding:"required"`
+	RoomTypeID string `uri:"room_type_id" binding:"required"`
+	Year       int    `uri:"year" binding:"required"`
+	Month      int    `uri:"month" binding:"required"`
+	Day        int    `uri:"day" binding:"required"`
+	FacilityID string `uri:"facility_id" binding:"required"`
+	Value      int    `uri:"value" binding:"required"`
 }
 
 func (s *stockHandler) GetPerMonth(c *gin.Context) {
