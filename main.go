@@ -123,7 +123,7 @@ func main() {
 	newApp.POST("/stockChange/stock/:facility_id/:room_type_id/:year/:month/:day/:value", stockHandler.UpdateStock)
 	newApp.POST(("/stockChange/reserved/:facility_id/:room_type_id/:year/:month/:day/:value"), stockHandler.UpdateReserved)
 	newApp.POST("/stockChange/stopSell/:facility_id/:room_type_id/:year/:month/:day/:value", stockHandler.UpdateStopSell)
-	newApp.POST("/stockChangeAPI/stock/:facility_id/:room_type_id", stockHandler.UpdateStockJson)
+	newApp.POST("/stockChangeAPI/stock/:facility_id", stockHandler.UpdateStockJson)
 	newApp.Run(":" + port)
 	slog.Info("runnning application in " + port)
 }
