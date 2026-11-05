@@ -9,10 +9,10 @@ import (
 )
 
 type StockData struct {
-	Date     string `json:"date" binding:"required,datetime=2006-01-02"`
+	Date     string `json:"date" binding:"required,datetime=2006/01/02"`
 	Stock    int    `json:"stock" binding:"required"`
 	Reserved int    `json:"reserved" binding:"required"`
-	Stopped  int    `json:"stopped" binding:"required"`
+	Stopped  int    `json:"stopSell" binding:"required"`
 }
 
 type RoomStockData struct {
@@ -63,10 +63,10 @@ type UpdateStockRequest struct {
 
 type UpdateStockJsonRequest struct {
 	RoomTypeID string `json:"room_type_id" binding:"required"`
-	Date       string `json:"date" binding:"required,datetime=2006-01-02"`
+	Date       string `json:"date" binding:"required,datetime=2006/01/02"`
 	Stock      *int   `json:"stock" binding:"gte=0"`
 	Reserved   *int   `json:"reserved" binding:"gte=0"`
-	Stopped    *int   `json:"stopped" binding:"gte=0"`
+	Stopped    *int   `json:"stopSell" binding:"gte=0"`
 }
 
 type UpdateStockUri struct {
