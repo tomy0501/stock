@@ -76,11 +76,7 @@ func (s *StockRepository) GetStockDataPerMonth(roomTypeID string, year int, mont
 	return &result, nil
 }
 
-func (s *StockRepository) PutStockData(roomTypeID string, year int, month int, day int, facilityID string, value int) error {
-	date, err := time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", year, month, day))
-	if err != nil {
-		return err
-	}
+func (s *StockRepository) PutStockData(roomTypeID string, date string, facilityID string, value int) error {
 	parsedRoomTypeID, err := uuid.Parse(roomTypeID)
 	if err != nil {
 		return err
@@ -94,17 +90,18 @@ func (s *StockRepository) PutStockData(roomTypeID string, year int, month int, d
 	UPDATE stock_room SET stock_quantity = ?
 	WHERE room_type_id = ? AND stock_date = ? AND facility_id = ?
 	`
-	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date.Format("2006-01-02"), parsedFacilityID[:])
+	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date, parsedFacilityID[:])
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *StockRepository) PutReservedData(roomTypeID string, year int, month int, day int, facilityID string, value int) error {
-	date, err := time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", year, month, day))
-	if err != nil {
+func (s *StockRepository) PutReservedData(roomTypeID string, date string, facilityID string, value int) error {
+	if parsedDate, err := time.Parse("2006-01-02", date); err != nil {
 		return err
+	} else {
+		date = parsedDate.Format("2006-01-02")
 	}
 	parsedRoomTypeID, err := uuid.Parse(roomTypeID)
 	if err != nil {
@@ -118,17 +115,18 @@ func (s *StockRepository) PutReservedData(roomTypeID string, year int, month int
 	sql := `
 	UPDATE stock_room SET reservation_quantity = ?
 	WHERE room_type_id = ? AND stock_date = ? AND facility_id = ?`
-	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date.Format("2006-01-02"), parsedFacilityID[:])
+	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date, parsedFacilityID[:])
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *StockRepository) PutStopSellData(roomTypeID string, year int, month int, day int, facilityID string, value int) error {
-	date, err := time.Parse("2006-01-02", fmt.Sprintf("%04d-%02d-%02d", year, month, day))
-	if err != nil {
+func (s *StockRepository) PutStopSellData(roomTypeID string, date string, facilityID string, value int) error {
+	if parsedDate, err := time.Parse("2006-01-02", date); err != nil {
 		return err
+	} else {
+		date = parsedDate.Format("2006-01-02")
 	}
 	parsedRoomTypeID, err := uuid.Parse(roomTypeID)
 	if err != nil {
@@ -142,7 +140,7 @@ func (s *StockRepository) PutStopSellData(roomTypeID string, year int, month int
 	sql := `
 	UPDATE stock_room SET stop_sale_quantity = ?
 	WHERE room_type_id = ? AND stock_date = ? AND facility_id = ?`
-	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date.Format("2006-01-02"), parsedFacilityID[:])
+	_, err = s.db.UserDB.Exec(sql, value, parsedRoomTypeID[:], date, parsedFacilityID[:])
 	if err != nil {
 		return err
 	}

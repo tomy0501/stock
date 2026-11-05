@@ -1,6 +1,7 @@
 package stock
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -29,9 +30,9 @@ const (
 
 type StockHandlerInterface interface {
 	GetStockDataPerMonth(roomTypeID string, year int, month int, facilityID string) (*RoomStockData, error)
-	PutStockData(roomTypeID string, year int, month int, day int, facilityID string, value int) error
-	PutReservedData(roomTypeID string, year int, month int, day int, facilityID string, value int) error
-	PutStopSellData(roomTypeID string, year int, month int, day int, facilityID string, value int) error
+	PutStockData(roomTypeID string, date string, facilityID string, value int) error
+	PutReservedData(roomTypeID string, date string, facilityID string, value int) error
+	PutStopSellData(roomTypeID string, date string, facilityID string, value int) error
 }
 
 type stockHandler struct {
@@ -58,6 +59,18 @@ type UpdateStockRequest struct {
 	Day        int    `uri:"day" binding:"required"`
 	FacilityID string `uri:"facility_id" binding:"required"`
 	Value      int    `uri:"value" binding:"required"`
+}
+
+type UpdateStockJsonRequest struct {
+	RoomTypeID string `json:"room_type_id" binding:"required"`
+	Date       string `json:"date" binding:"required,datetime=2006-01-02"`
+	Stock      *int   `json:"stock" binding:"gte=0"`
+	Reserved   *int   `json:"reserved" binding:"gte=0"`
+	Stopped    *int   `json:"stopped" binding:"gte=0"`
+}
+
+type UpdateStockUri struct {
+	FacilityID string `uri:"facility_id" binding:"required"`
 }
 
 func (s *stockHandler) GetPerMonth(c *gin.Context) {
@@ -97,9 +110,9 @@ func (s *stockHandler) UpdateStock(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "invalid session status"})
 		return
 	}
+	date := fmt.Sprintf("%04d-%02d-%02d", urlParams.Year, urlParams.Month, urlParams.Day)
+	err := s.StockHandlerIF.PutStockData(urlParams.RoomTypeID, date, urlParams.FacilityID, urlParams.Value)
 
-	err := s.StockHandlerIF.PutStockData(urlParams.RoomTypeID, urlParams.Year, urlParams.Month, urlParams.Day,
-		urlParams.FacilityID, urlParams.Value)
 	if err != nil {
 		slog.Error("failed to update stock data", "error", err)
 		c.JSON(500, gin.H{"message": "failed to update stock data"})
@@ -124,8 +137,8 @@ func (s *stockHandler) UpdateReserved(c *gin.Context) {
 		return
 	}
 
-	err := s.StockHandlerIF.PutReservedData(urlParams.RoomTypeID, urlParams.Year, urlParams.Month, urlParams.Day,
-		urlParams.FacilityID, urlParams.Value)
+	date := fmt.Sprintf("%04d-%02d-%02d", urlParams.Year, urlParams.Month, urlParams.Day)
+	err := s.StockHandlerIF.PutReservedData(urlParams.RoomTypeID, date, urlParams.FacilityID, urlParams.Value)
 	if err != nil {
 		slog.Error("failed to update reserved data", "error", err)
 		c.JSON(500, gin.H{"message": "failed to update reserved data"})
@@ -148,13 +161,61 @@ func (s *stockHandler) UpdateStopSell(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "invalid session status"})
 		return
 	}
+	date := fmt.Sprintf("%04d-%02d-%02d", urlParams.Year, urlParams.Month, urlParams.Day)
 
-	err := s.StockHandlerIF.PutStopSellData(urlParams.RoomTypeID, urlParams.Year, urlParams.Month, urlParams.Day,
-		urlParams.FacilityID, urlParams.Value)
+	err := s.StockHandlerIF.PutStopSellData(urlParams.RoomTypeID, date, urlParams.FacilityID, urlParams.Value)
 	if err != nil {
 		slog.Error("failed to update stop sell data", "error", err)
 		c.JSON(500, gin.H{"message": "failed to update stop sell data"})
 		return
 	}
 	c.JSON(200, gin.H{"message": "success"})
+}
+
+func (s *stockHandler) UpdateStockJson(c *gin.Context) {
+	var urlParams UpdateStockUri
+	if err := c.ShouldBindUri(&urlParams); err != nil {
+		slog.Error("failed to bind URL parameters", "error", err)
+		c.JSON(400, gin.H{"message": "invalid URL parameters"})
+		return
+	}
+
+	var jsonParams UpdateStockJsonRequest
+	if err := c.ShouldBindJSON(&jsonParams); err != nil {
+		slog.Error("failed to bind JSON parameters", "error", err)
+		c.JSON(400, gin.H{"message": "invalid JSON parameters"})
+		return
+	}
+
+	userID := c.GetString("userID")
+	if userID == "" {
+		slog.Error("not exists userID")
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "invalid session status"})
+		return
+	}
+
+	if jsonParams.Stock != nil {
+		err := s.StockHandlerIF.PutStockData(jsonParams.RoomTypeID, jsonParams.Date, urlParams.FacilityID, *jsonParams.Stock)
+		if err != nil {
+			slog.Error("failed to update stock data", "error", err)
+			c.JSON(500, gin.H{"message": "failed to update stock data"})
+			return
+		}
+	}
+	if jsonParams.Reserved != nil {
+		err := s.StockHandlerIF.PutReservedData(jsonParams.RoomTypeID, jsonParams.Date, urlParams.FacilityID, *jsonParams.Reserved)
+		if err != nil {
+			slog.Error("failed to update reserved data", "error", err)
+			c.JSON(500, gin.H{"message": "failed to update reserved data"})
+			return
+		}
+	}
+	if jsonParams.Stopped != nil {
+		err := s.StockHandlerIF.PutStopSellData(jsonParams.RoomTypeID, jsonParams.Date, urlParams.FacilityID, *jsonParams.Stopped)
+		if err != nil {
+			slog.Error("failed to update stop sell data", "error", err)
+			c.JSON(500, gin.H{"message": "failed to update stop sell data"})
+			return
+		}
+	}
 }
